@@ -22,8 +22,7 @@ def monty_hall_markov(trials=10000):
             wins_stay += 1
             
     return wins_stay, wins_change
-
-trials = 10000
+trials = 1000000
 wins_stay, wins_change = monty_hall_markov(trials)
 print(f"Staying wins: {wins_stay} ({(wins_stay / trials) * 100:.2f}%)")
 print(f"Changing wins: {wins_change} ({(wins_change / trials) * 100:.2f}%)")
