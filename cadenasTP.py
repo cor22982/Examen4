@@ -1,28 +1,38 @@
+from pydtmc import MarkovChain
 import numpy as np
 
-def monty_hall_markov(trials=10000):
-    # Estados: 0 - Puerta con premio, 1-9 Puertas sin premio
+def simulate_monty_hall_markov(trials=10000):
+    # Definición de la matriz de transición para el problema Monty Hall con 10 puertas
+    # Estados: 0 - Inicial, 1 - Puerta con premio elegida, 2 - Puerta sin premio elegida
+    p_matrix = [
+        [0, 0.1, 0.9],  # Desde estado inicial, 10% de elegir la puerta con premio, 90% sin premio
+        [0, 1, 0],       # Si inicialmente eligió la puerta con premio, se mantiene en ese estado
+        [0, 1, 0]        # Si cambia después de elegir una puerta sin premio, va al estado de premio (cambio forzado al premio)
+    ]
+
+    # Creación de la cadena de Markov
+    mc = MarkovChain(p_matrix, ['Inicial', 'Premio', 'No Premio'])
+
+    # Simulación de resultados
     wins_change = 0
     wins_stay = 0
-    transition_matrix = np.array([[0, 1], [1, 0]])  # Cambiar o quedarse
 
     for _ in range(trials):
-        prize_door = np.random.randint(0, 10)
-        chosen_door = np.random.randint(0, 10)
-        
-        if chosen_door == prize_door:
-            state = 0  # Estado ganador
+        initial_state = 0  # Siempre empezamos en el estado inicial
+        if np.random.rand() < 0.1:
+            final_state = 1  # Se queda con la puerta original que tiene el premio
         else:
-            state = 1  # Estado perdedor
+            final_state = 2  # Cambia a la única otra puerta no abierta que tiene el premio
 
-        final_state = np.random.choice([0, 1], p=transition_matrix[state])
-        if final_state == 0:
-            wins_change += 1
-        else:
+        if final_state == 1:
             wins_stay += 1
-            
+        if final_state == 2:
+            wins_change += 1
+
     return wins_stay, wins_change
+
+# Número de simulaciones
 trials = 1000000
-wins_stay, wins_change = monty_hall_markov(trials)
+wins_stay, wins_change = simulate_monty_hall_markov(trials)
 print(f"Staying wins: {wins_stay} ({(wins_stay / trials) * 100:.2f}%)")
 print(f"Changing wins: {wins_change} ({(wins_change / trials) * 100:.2f}%)")
